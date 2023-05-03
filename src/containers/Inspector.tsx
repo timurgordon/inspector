@@ -6,6 +6,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import FlashOn from "@material-ui/icons/FlashOn";
 import FlashOff from "@material-ui/icons/FlashOff";
 import History from "@material-ui/icons/History";
+import SettingsIcon from "@material-ui/icons/Settings";
 import Keyboard from "@material-ui/icons/Keyboard";
 import MonacoEditor from "@etclabscore/react-monaco-editor";
 import PlusIcon from "@material-ui/icons/Add";
@@ -22,6 +23,11 @@ import {
   Tooltip,
   Grid,
   Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  TextField,
   ListItem,
   List,
   ListItemText,
@@ -139,6 +145,8 @@ const emptyJSONRPC = {
   id: 0,
 };
 
+const defaultSettings = {'timeout': 5000}
+
 const Inspector: React.FC<IProps> = (props) => {
   const {
     setTabContent,
@@ -187,6 +195,8 @@ const Inspector: React.FC<IProps> = (props) => {
     props.customTransport || defaultTransports[0],
     debouncedtransportOptions,
   );
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settings, setSettings] = useState(defaultSettings);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [requestHistory, setRequestHistory]: [any[], Dispatch<any>] = useState([]);
   const [historySelectedIndex, setHistorySelectedIndex] = useState(0);
@@ -306,6 +316,10 @@ const Inspector: React.FC<IProps> = (props) => {
       props.onToggleDarkMode();
     }
   };
+  const handleSettingsSave = (evt: Event) => {
+    console.log(evt)
+    setSettings({"timeout":7500})
+  };
   const refreshOpenRpcDocument = async () => {
     try {
       const d = await transport?.sendData({
@@ -403,6 +417,13 @@ const Inspector: React.FC<IProps> = (props) => {
     }
   };
 
+  const handleSettingsChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    if (Number(event.target.value)) {
+        const timeout = parseInt(event.target.value);
+        setSettings({"timeout": timeout})
+    }
+  };
+
   return (
     <>
       <Dialog onClose={() => setHistoryOpen(false)} aria-labelledby="simple-dialog-title" open={historyOpen} >
@@ -455,6 +476,30 @@ const Inspector: React.FC<IProps> = (props) => {
               </Grid>
           }
         </Container>
+      </Dialog>
+      <Dialog onClose={() => setSettingsOpen(false)} aria-labelledby="simple-dialog-title" open={settingsOpen} >
+      <DialogTitle>Settings</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Settings for inspector requests.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            inputProps={{ step: "500" }}
+            margin="dense"
+            id="timeout"
+            label="WebSocket Timeout"
+            type="number"
+            value={settings.timeout}
+            fullWidth
+            variant="standard"
+            onChange={handleSettingsChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {setSettingsOpen(false); setSettings(defaultSettings)}}>Default</Button>
+          <Button onClick={() => setSettingsOpen(false)}>Save</Button>
+        </DialogActions>
       </Dialog>
 
       <div style={{ position: "relative" }}>
@@ -586,6 +631,11 @@ const Inspector: React.FC<IProps> = (props) => {
           <Tooltip title="History">
             <IconButton onClick={() => setHistoryOpen(true)}>
               <History />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Settings">
+            <IconButton onClick={() => setSettingsOpen(true)}>
+              <SettingsIcon />
             </IconButton>
           </Tooltip>
           {
