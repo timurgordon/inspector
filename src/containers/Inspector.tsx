@@ -260,7 +260,7 @@ const Inspector: React.FC<IProps> = (props) => {
         const result = await transport.sendData({
           internalID: json.id,
           request: json,
-        });
+        }, settings.timeout);
         const responseTimestamp = new Date();
         const r = { jsonrpc: "2.0", result, id: json.id };
         const reqObj: JSONRPCLog = {
@@ -315,10 +315,6 @@ const Inspector: React.FC<IProps> = (props) => {
     if (props.onToggleDarkMode) {
       props.onToggleDarkMode();
     }
-  };
-  const handleSettingsSave = (evt: Event) => {
-    console.log(evt)
-    setSettings({"timeout":7500})
   };
   const refreshOpenRpcDocument = async () => {
     try {
@@ -488,7 +484,7 @@ const Inspector: React.FC<IProps> = (props) => {
             inputProps={{ step: "500" }}
             margin="dense"
             id="timeout"
-            label="WebSocket Timeout"
+            label="Request Timeout"
             type="number"
             value={settings.timeout}
             fullWidth
