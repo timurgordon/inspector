@@ -145,7 +145,7 @@ const emptyJSONRPC = {
   id: 0,
 };
 
-const defaultSettings = {'timeout': 5000}
+const defaultSettings = {'timeout': 10000}
 
 const Inspector: React.FC<IProps> = (props) => {
   const {
